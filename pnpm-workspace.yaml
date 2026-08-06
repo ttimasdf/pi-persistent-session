@@ -1,0 +1,16 @@
+allowBuilds:
+  '@google/genai': false
+  protobufjs: false
+
+overrides:
+  '@earendil-works/pi-agent-core': 0.84.0
+  '@earendil-works/pi-ai': 0.84.0
+  '@earendil-works/pi-client': 0.84.0
+  '@earendil-works/pi-coding-agent': 0.84.0
+  '@earendil-works/pi-protocol': 0.84.0
+  '@earendil-works/pi-telemetry': 0.84.0
+  '@earendil-works/pi-tui': 0.84.0
+  '@aws-sdk/credential-provider-ini': 3.973.3
+  '@aws-sdk/credential-provider-login': 3.972.65
+  '@aws-sdk/credential-provider-node': 3.972.69
+  '@aws-sdk/credential-provider-sso': 3.973.3
