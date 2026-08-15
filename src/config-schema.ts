@@ -7,12 +7,6 @@ export const SessionNamespacePolicySchema = Type.Union([
 	Type.Literal("never"),
 ]);
 
-export const GitignorePolicySchema = Type.Union([
-	Type.Literal("auto"),
-	Type.Literal("prompt"),
-	Type.Literal("never"),
-]);
-
 export const RelocationPolicySchema = Type.Union([
 	Type.Literal("auto"),
 	Type.Literal("prompt"),
@@ -22,7 +16,6 @@ export const RelocationPolicySchema = Type.Union([
 const StoredSettingsSchema = Type.Object(
 	{
 		sessionNamespacePolicy: Type.Optional(SessionNamespacePolicySchema),
-		gitignorePolicy: Type.Optional(GitignorePolicySchema),
 		relocationPolicy: Type.Optional(RelocationPolicySchema),
 		removeOriginalSessions: Type.Optional(Type.Boolean()),
 	},
@@ -52,7 +45,6 @@ export const WorkspaceIdentitySchema = Type.Object(
 export type SessionNamespacePolicy = Static<
 	typeof SessionNamespacePolicySchema
 >;
-export type GitignorePolicy = Static<typeof GitignorePolicySchema>;
 export type RelocationPolicy = Static<typeof RelocationPolicySchema>;
 export type PersistentSessionSettings = Required<
 	Static<typeof StoredSettingsSchema>
@@ -65,7 +57,6 @@ export type WorkspaceIdentity = Static<typeof WorkspaceIdentitySchema>;
 
 export const DEFAULT_SETTINGS: Readonly<PersistentSessionSettings> = {
 	sessionNamespacePolicy: "prompt",
-	gitignorePolicy: "prompt",
 	relocationPolicy: "prompt",
 	removeOriginalSessions: false,
 };

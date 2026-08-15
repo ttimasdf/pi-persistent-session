@@ -1,4 +1,4 @@
-import { promises as fs } from "node:fs";
+import { promises as fs, statSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import {
 	CONFIG_DIR_NAME,
@@ -47,8 +47,20 @@ export function relocationDirectories(
 	return { sourceDir: resolve(sourceDir), targetDir };
 }
 
+export function projectWorkspacePath(cwd: string): string {
+	return join(resolve(cwd), CONFIG_DIR_NAME, WORKSPACE_FILE_NAME);
+}
+
 export function workspacePath(cwd: string): string {
-	return join(cwd, CONFIG_DIR_NAME, WORKSPACE_FILE_NAME);
+	const gitDir = join(resolve(cwd), ".git");
+	try {
+		if (statSync(gitDir).isDirectory()) {
+			return join(gitDir, WORKSPACE_FILE_NAME);
+		}
+	} catch (error) {
+		if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+	}
+	return projectWorkspacePath(cwd);
 }
 
 export async function loadWorkspaceIdentity(

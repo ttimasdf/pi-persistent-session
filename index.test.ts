@@ -15,8 +15,10 @@ import {
 import {
 	defaultSessionDirForCwd,
 	parseWorkspaceIdentity,
+	projectWorkspacePath,
 	relocationDirectories,
 	sessionNamespaceIdForCwd,
+	workspacePath,
 } from "./src/workspace.ts";
 
 const cleanupPaths: string[] = [];
@@ -49,7 +51,7 @@ test("workspace identity requires a safe session namespace ID", () => {
 	assert.throws(() =>
 		parseWorkspaceIdentity({
 			version: 1,
-			workspaceId: "legacy-workspace-id",
+			workspaceId: "invalid-workspace-id",
 			observedCwd: "/tmp/project",
 		}),
 	);
@@ -60,6 +62,45 @@ test("workspace identity requires a safe session namespace ID", () => {
 			observedCwd: "/tmp/project",
 		}),
 	);
+});
+
+test("workspace marker uses .pi without Git and .git with precedence", async () => {
+	const root = await mkdtemp(join(tmpdir(), "pi-persistent-session-path-"));
+	cleanupPaths.push(root);
+
+	assert.equal(workspacePath(root), projectWorkspacePath(root));
+	await writeFile(join(root, ".git"), "gitdir: /tmp/worktree\n");
+	assert.equal(workspacePath(root), projectWorkspacePath(root));
+	await rm(join(root, ".git"));
+	await mkdir(join(root, ".git"));
+	assert.equal(
+		workspacePath(root),
+		join(root, ".git", "persistent-session.json"),
+	);
+});
+
+test("Git marker takes precedence without modifying the .pi marker", async () => {
+	const root = await mkdtemp(join(tmpdir(), "pi-persistent-session-precedence-"));
+	cleanupPaths.push(root);
+	await mkdir(join(root, ".git"));
+	await mkdir(join(root, ".pi"));
+	const projectPath = projectWorkspacePath(root);
+	const gitPath = workspacePath(root);
+	const projectContent = `${JSON.stringify({
+		version: 1,
+		sessionNamespaceId: "--project--",
+		observedCwd: "/project",
+	})}\n`;
+	const gitContent = `${JSON.stringify({
+		version: 1,
+		sessionNamespaceId: "--git--",
+		observedCwd: "/git",
+	})}\n`;
+	await writeFile(projectPath, projectContent);
+	await writeFile(gitPath, gitContent);
+
+	assert.equal(await readFile(workspacePath(root), "utf8"), gitContent);
+	assert.equal(await readFile(projectPath, "utf8"), projectContent);
 });
 
 test("default session directory and namespace match Pi's encoded-cwd shape", () => {

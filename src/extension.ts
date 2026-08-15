@@ -13,12 +13,10 @@ import {
 } from "./config.ts";
 import {
 	DEFAULT_SETTINGS,
-	GitignorePolicySchema,
 	type PersistentSessionSettings,
 	RelocationPolicySchema,
 	SessionNamespacePolicySchema,
 } from "./config-schema.ts";
-import { checkGitignore } from "./gitignore.ts";
 import {
 	migrateSessionFiles,
 	type SessionMigrationResult,
@@ -173,7 +171,6 @@ export default function persistentSessionExtension(pi: ExtensionAPI) {
 			) {
 				blockedReason = `Workspace moved from ${identity.observedCwd}; migrate sessions or restart without this extension`;
 			}
-			await checkGitignore(pi, ctx, markerPath, settings.gitignorePolicy);
 			await handleRelocation(identity, ctx);
 		} catch (error) {
 			ctx.ui.notify(
@@ -249,7 +246,6 @@ export default function persistentSessionExtension(pi: ExtensionAPI) {
 				settings = await loadSettings();
 				const selected = await ctx.ui.select("Persistent-session setting", [
 					`Session namespace creation: ${settings.sessionNamespacePolicy}`,
-					`Gitignore handling: ${settings.gitignorePolicy}`,
 					`Relocation handling: ${settings.relocationPolicy}`,
 					`Remove original sessions: ${settings.removeOriginalSessions ? "yes" : "no"}`,
 				]);
@@ -263,15 +259,6 @@ export default function persistentSessionExtension(pi: ExtensionAPI) {
 					]);
 					if (Value.Check(SessionNamespacePolicySchema, value)) {
 						settings.sessionNamespacePolicy = value;
-					}
-				} else if (selected.startsWith("Gitignore")) {
-					const value = await ctx.ui.select("Gitignore handling", [
-						"auto",
-						"prompt",
-						"never",
-					]);
-					if (Value.Check(GitignorePolicySchema, value)) {
-						settings.gitignorePolicy = value;
 					}
 				} else if (selected.startsWith("Relocation")) {
 					const value = await ctx.ui.select("Relocation handling", [
