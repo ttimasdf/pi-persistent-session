@@ -1,5 +1,7 @@
 # pi-persistent-session
 
+[中文](./README_CN.md) | English
+
 A minimal Pi extension that moves project-associated session JSONL files when a workspace directory moves.
 
 ## How it works
