@@ -2,15 +2,29 @@
 
 [中文](./README_CN.md) | English
 
-A minimal Pi extension that moves project-associated session JSONL files when a workspace directory moves.
+A minimal Pi extension that keeps a workspace identity marker and moves project-associated session JSONL files when a workspace directory moves.
+
+The workspace identity marker is stored in one of these locations:
+
+| Data | Location |
+|---|---|
+| Workspace identity | `.git/persistent-session.json` when the workspace is a Git repository with a `.git` directory; otherwise `.pi/persistent-session.json` |
 
 ## How it works
 
-On `session_start`, the extension optionally creates this workspace-local identity:
+On `session_start`, the extension optionally creates a workspace identity marker. When the workspace is a Git repository with a `.git` directory, the marker lives in Git metadata and cannot be committed:
+
+```text
+.git/persistent-session.json
+```
+
+Otherwise, including Git worktrees and submodules whose `.git` entry is a file, it falls back to:
 
 ```text
 .pi/persistent-session.json
 ```
+
+The extension checks only whether the workspace itself contains a `.git` directory; it does not search for an enclosing Git repository.
 
 ```json
 {
@@ -21,6 +35,8 @@ On `session_start`, the extension optionally creates this workspace-local identi
 ```
 
 `sessionNamespaceId` is the directory name from Pi's default `<agentDir>/sessions/<sessionNamespaceId>` mapping. Keeping that name instead of an absolute session-directory path lets the extension find a copied Pi session tree under the current agent directory.
+
+When both marker locations exist, `.git/persistent-session.json` takes precedence and `.pi/persistent-session.json` is left untouched. The `.pi` location remains the normal storage location otherwise.
 
 When `observedCwd` differs from Pi's current cwd and the previous path no longer exists, the extension can migrate the old workspace's sessions. It:
 
@@ -65,11 +81,10 @@ Use `/persistent-session-settings` to edit one setting at a time.
 | Setting | Values | Default |
 |---|---|---|
 | `sessionNamespacePolicy` | `auto`, `prompt`, `never` | `prompt` |
-| `gitignorePolicy` | `auto`, `prompt`, `never` | `prompt` |
 | `relocationPolicy` | `auto`, `prompt`, `warn` | `prompt` |
 | `removeOriginalSessions` | boolean | `false` |
 
-When enabled, Git handling recommends or adds an exact ignore rule for `.pi/persistent-session.json`. If the file is already tracked, the extension warns but does not alter the Git index.
+The selected marker location is created only when `sessionNamespacePolicy` allows it.
 
 ## Commands
 

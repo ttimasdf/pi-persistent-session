@@ -2,15 +2,29 @@
 
 [English](./README.md) | 中文
 
-一个最小化的 Pi 扩展，用于在工作区目录移动后，迁移该工作区对应的非活动会话 JSONL 文件。
+一个最小化的 Pi 扩展，用于保存工作区身份标记，并在工作区目录移动后迁移该工作区对应的非活动会话 JSONL 文件。
+
+工作区身份标记存储在以下位置之一：
+
+| 数据 | 位置 |
+|---|---|
+| 工作区身份 | 当工作区是包含 `.git` 目录的 Git 仓库时使用 `.git/persistent-session.json`，否则使用 `.pi/persistent-session.json` |
 
 ## 工作方式
 
-在 `session_start` 时，扩展会在工作区内创建或读取这个身份标记：
+在 `session_start` 时，扩展会在工作区内按需创建身份标记。如果工作区是包含 `.git` 目录的 Git 仓库，标记会存放在 Git 元数据中，因此不会被提交：
+
+```text
+.git/persistent-session.json
+```
+
+其他情况下（包括 `.git` 是文件的 Git worktree 和 submodule），会回退到：
 
 ```text
 .pi/persistent-session.json
 ```
+
+扩展只检查工作区自身是否包含 `.git` 目录，不会向上搜索外围 Git 仓库。
 
 ```json
 {
@@ -21,6 +35,8 @@
 ```
 
 `sessionNamespaceId` 是 Pi 默认 `<agentDir>/sessions/<sessionNamespaceId>` 映射中的目录名。保留这个名称而不是绝对路径，可以让扩展在当前 agent 目录下找到被复制过来的 Pi 会话树。
+
+如果两个位置都存在标记，`.git/persistent-session.json` 优先使用，`.pi/persistent-session.json` 保持不变。其他情况下，`.pi` 仍然是正常的存储位置。
 
 当 `observedCwd` 和 Pi 当前 cwd 不一致，并且旧路径已不存在时，扩展会尝试迁移旧工作区的会话：
 
@@ -65,11 +81,10 @@ Pi 没有插件设置注册 API。此扩展将设置存储在：
 | Setting | Values | Default |
 |---|---|---|
 | `sessionNamespacePolicy` | `auto`, `prompt`, `never` | `prompt` |
-| `gitignorePolicy` | `auto`, `prompt`, `never` | `prompt` |
 | `relocationPolicy` | `auto`, `prompt`, `warn` | `prompt` |
 | `removeOriginalSessions` | boolean | `false` |
 
-启用 Git 处理时，扩展会建议或添加 `.pi/persistent-session.json` 的精确忽略规则。如果该文件已经被跟踪，扩展会警告，但不会修改 Git 索引。
+只有当 `sessionNamespacePolicy` 允许时才会创建所选位置的新标记。
 
 ## 命令
 

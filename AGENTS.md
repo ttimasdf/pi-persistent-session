@@ -9,9 +9,8 @@
 - `README.md` for the intended user-facing behavior.
 - `src/extension.ts` for Pi event flow and commands.
 - `src/session-migration.ts` for migration rules.
-- `src/workspace.ts` for marker and session-directory mapping.
+- `src/workspace.ts` for Git-local marker migration and session-directory mapping.
 - `src/config-schema.ts` and `src/config.ts` for settings.
-- `src/gitignore.ts` for Git integration.
 - `index.test.ts` for the current regression shape.
 
 ## Work Rules
