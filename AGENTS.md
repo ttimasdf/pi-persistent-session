@@ -21,6 +21,7 @@
 - Resolve paths before comparing or storing them.
 - Keep workspace-marker semantics stable unless the user asks to change them.
 - Update tests and `README.md` when behavior changes.
+- Bump versions only with `pnpm version <version> --sign-git-tag` (commits the bump and creates the signed `v<version>` tag).
 
 ## Commands
 
