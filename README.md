@@ -2,6 +2,9 @@
 
 [中文](./README_CN.md) | English
 
+[![pi package catalog](https://img.shields.io/badge/pi-package%20catalog-5B5BD6.svg)](https://pi.dev/packages/pi-persistent-session)
+[![npm](https://img.shields.io/npm/v/pi-persistent-session.svg)](https://www.npmjs.com/package/pi-persistent-session)
+
 A minimal Pi extension that keeps a workspace identity marker and moves project-associated session JSONL files when a workspace directory moves.
 
 The workspace identity marker is stored in one of these locations:
@@ -55,6 +58,12 @@ After migration, use `/resume` to select a migrated session. `/reload` reloads e
 If the previous cwd still exists, the extension treats the workspace as a copy and does not migrate sessions automatically.
 
 ## Installation
+
+Install from npm:
+
+```bash
+pi install npm:pi-persistent-session
+```
 
 From this checkout:
 

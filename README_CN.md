@@ -2,6 +2,9 @@
 
 [English](./README.md) | 中文
 
+[![pi package catalog](https://img.shields.io/badge/pi-package%20catalog-5B5BD6.svg)](https://pi.dev/packages/pi-persistent-session)
+[![npm](https://img.shields.io/npm/v/pi-persistent-session.svg)](https://www.npmjs.com/package/pi-persistent-session)
+
 一个最小化的 Pi 扩展，用于保存工作区身份标记，并在工作区目录移动后迁移该工作区对应的非活动会话 JSONL 文件。
 
 工作区身份标记存储在以下位置之一：
@@ -55,6 +58,12 @@
 如果旧 cwd 仍然存在，扩展会把它视为复制而不是移动，因此不会自动迁移会话。
 
 ## 安装
+
+从 npm 安装：
+
+```bash
+pi install npm:pi-persistent-session
+```
 
 在当前 checkout 中：
 
